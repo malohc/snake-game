@@ -21,6 +21,7 @@ screen = pygame.display.set_mode((COLUMN_SIZE*GRID_SIZE, ROW_SIZE*GRID_SIZE))
 pygame.display.set_caption('SNAKE')
 clock = pygame.time.Clock()
 
+
 def gameLoop():
     game_over = False
 
@@ -55,6 +56,11 @@ def gameLoop():
         head_pos_x, head_pos_y = move_snake(head_pos_x, head_pos_y, direction)
         new_head = [head_pos_x, head_pos_y]
 
+        #Check for snake collisions
+        if detect_collision(new_head, snake):
+            game_over = True
+            break
+
         snake.insert(0, new_head)
 
         #Check if food had been eaten 
@@ -83,13 +89,13 @@ def draw_block(position, color):
 
 def detect_movement(direction, event):
     if event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_UP :
+        if event.key == pygame.K_UP  and direction != "DOWN":
             return "UP"
-        elif event.key == pygame.K_DOWN:
+        elif event.key == pygame.K_DOWN and direction != "UP":
             return "DOWN"
-        elif event.key == pygame.K_LEFT:
+        elif event.key == pygame.K_LEFT and direction != "RIGHT":
             return "LEFT"
-        elif event.key == pygame.K_RIGHT:
+        elif event.key == pygame.K_RIGHT and direction != "LEFT":
             return "RIGHT"
     return direction;
 
@@ -110,6 +116,21 @@ def detect_food_collision(snake_head, food_pos):
         new_food = [random.randint(0, COLUMN_SIZE - 1), random.randint(0, ROW_SIZE - 1)]
         return True, new_food
     return False, food_pos
+
+def detect_collision(head, body):
+    #Detecting collision with self
+    if head in body:
+        return True
+
+    #Detecting wall collision
+    if (head[0] < 0 or 
+        head[0] >= COLUMN_SIZE or
+        head[1] < 0 or
+        head[1] >= ROW_SIZE):
+        return True
+
+    return False
+
 
 gameLoop()
 pygame.quit()
