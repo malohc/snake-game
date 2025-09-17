@@ -10,9 +10,10 @@ GRID_SIZE= 10
 SCREEN_COLOR = (0, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
 FOOD_COLOR = (255, 0, 0)
+FONT_COLOR = (0, 255, 0)
 
 #Constant for snake initial speed
-SPEED = 15
+SPEED = 10
 
 pygame.init()
 
@@ -80,6 +81,9 @@ def gameLoop():
 
         pygame.display.update()
         clock.tick(speed)
+    
+    #Initialize Restart Screen
+    game_restart()
 
 def draw_block(position, color):
     x = position[0] * GRID_SIZE
@@ -130,6 +134,35 @@ def detect_collision(head, body):
         return True
 
     return False
+
+def game_restart():
+    font = pygame.font.SysFont("arial", 30)
+    text = font.render("GAME OVER, PRESSS R to RESTART or Q to QUIT", True, (FONT_COLOR))
+    rect = text.get_rect(center = (COLUMN_SIZE * GRID_SIZE // 2, ROW_SIZE * GRID_SIZE // 2))
+
+    waiting = True
+
+    while waiting:
+        screen.fill(SCREEN_COLOR)
+        screen.blit(text, rect)
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            #Quits game when event changes to QUIT
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+            
+            #Changes event based on key stroke
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    gameLoop()
+                    waiting = False
+                elif event.key == pygame.K_q:
+                    pygame.quit()
+                    return
+            
+
 
 
 gameLoop()
