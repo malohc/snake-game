@@ -3,7 +3,9 @@ import pygame
 COLUMNS = 60
 ROWS = 40
 BLOCKS = 10
+
 SNAKE_COLOR = (0, 255, 0)
+
 
 pygame.init()
 
@@ -15,18 +17,22 @@ clock = pygame.time.Clock()
 def gameLoop():
     game_over = False
 
-    x1 = COLUMNS/2
-    y1 = ROWS/2
+    initial_pos_x = COLUMNS/2
+    initial_pos_y = ROWS/2
 
+    direction = "RIGHT"
     while not game_over:
         
         for event in pygame.event.get():
+
             if event.type == pygame.QUIT:
                 game_over = True
+            
+            direction = detect_movement(direction, event)
         
         screen.fill((0,0,0))
 
-        create_block([x1,y1], (SNAKE_COLOR))
+        create_block([initial_pos_x, initial_pos_y], (SNAKE_COLOR))
 
         pygame.display.update()
 
@@ -37,6 +43,30 @@ def create_block(position, color):
     y = position[1] * BLOCKS
 
     pygame.draw.rect(screen, color, (x, y, BLOCKS, BLOCKS))
+
+def detect_movement(direction, event):
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_UP :
+            return "UP"
+        elif event.key == pygame.K_DOWN:
+            return "DOWN"
+        elif event.key == pygame.K_LEFT:
+            return "LEFT"
+        elif event.key == pygame.K_RIGHT:
+            return "RIGHT"
+    return direction;
+
+def move_snake(pos_x, pos_y, direction):
+    if direction == "UP":
+        pos_x = pos_y - 1;
+    if direction == "DOWN":
+        pos_x = pos_y + 1;
+    if direction == "LEFT":
+        pos_x = pos_x - 1;
+    if direction == "RIGHT":
+        pos_x = pos_x + 1;
+
+    return[pos_x, pos_y]
 
 gameLoop()
 pygame.quit()
