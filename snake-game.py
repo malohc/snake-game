@@ -17,8 +17,8 @@ clock = pygame.time.Clock()
 def gameLoop():
     game_over = False
 
-    initial_pos_x = COLUMNS/2
-    initial_pos_y = ROWS/2
+    snake_pos_x = COLUMNS/2
+    snake_pos_y = ROWS/2
 
     direction = "RIGHT"
     while not game_over:
@@ -29,10 +29,12 @@ def gameLoop():
                 game_over = True
             
             direction = detect_movement(direction, event)
+
+        snake_pos_x, snake_pos_y = move_snake(snake_pos_x, snake_pos_y, direction)
         
         screen.fill((0,0,0))
 
-        create_block([initial_pos_x, initial_pos_y], (SNAKE_COLOR))
+        create_block([snake_pos_x, snake_pos_y], (SNAKE_COLOR))
 
         pygame.display.update()
 
@@ -58,9 +60,9 @@ def detect_movement(direction, event):
 
 def move_snake(pos_x, pos_y, direction):
     if direction == "UP":
-        pos_x = pos_y - 1;
+        pos_y = pos_y - 1;
     if direction == "DOWN":
-        pos_x = pos_y + 1;
+        pos_y = pos_y + 1;
     if direction == "LEFT":
         pos_x = pos_x - 1;
     if direction == "RIGHT":
