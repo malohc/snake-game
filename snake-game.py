@@ -1,26 +1,46 @@
 import pygame
+import random
 
-COLUMNS = 60
-ROWS = 40
-BLOCKS = 10
+#Constants for Sizing
+COLUMN_SIZE = 60
+ROW_SIZE = 40
+GRID_SIZE= 10
 
+#Constants for object colors 
+SCREEN_COLOR = (0, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
+FOOD_COLOR = (255, 0, 0)
 
+#Constant for snake initial speed
+SPEED = 15
 
 pygame.init()
 
-screen = pygame.display.set_mode((COLUMNS*BLOCKS, ROWS*BLOCKS))
-
+#Initialise game screen
+screen = pygame.display.set_mode((COLUMN_SIZE*GRID_SIZE, ROW_SIZE*GRID_SIZE))
 pygame.display.set_caption('SNAKE')
 clock = pygame.time.Clock()
 
 def gameLoop():
     game_over = False
 
-    snake_pos_x = COLUMNS/2
-    snake_pos_y = ROWS/2
+    #Starts snake in middle of screen 
+    snake_pos_x = COLUMN_SIZE//2
+    snake_pos_y = ROW_SIZE//2
+    snake = [[snake_pos_x, snake_pos_y]]
 
+    #Places first food block at random position within grid
+    food_pos_x =  random.randint(0, COLUMN_SIZE -1)
+    food_pos_y = random.randint(0, ROW_SIZE - 1)
+    food = [food_pos_x, food_pos_y]
+
+    #Dictates snake movement speed 
+    speed = SPEED
+
+    #Snake initial movement direction is right
     direction = "RIGHT"
+
+
     while not game_over:
         
         for event in pygame.event.get():
@@ -30,21 +50,36 @@ def gameLoop():
             
             direction = detect_movement(direction, event)
 
-        snake_pos_x, snake_pos_y = move_snake(snake_pos_x, snake_pos_y, direction)
-        
-        screen.fill((0,0,0))
+        #Implements snake movement based off snake head
+        head_pos_x, head_pos_y = snake[0]
+        head_pos_x, head_pos_y = move_snake(head_pos_x, head_pos_y, direction)
+        new_head = [head_pos_x, head_pos_y]
 
-        draw_snake([snake_pos_x, snake_pos_y], (SNAKE_COLOR))
+        snake.insert(0, new_head)
+
+        #Check if food had been eaten 
+        food_eaten, food = detect_food_collision(new_head, food)
+        if not food_eaten:
+            snake.pop()
+
+        #Draw Screen
+        screen.fill((SCREEN_COLOR))
+
+        #Draws snake
+        for snake_pos in snake:
+            draw_block(snake_pos, (SNAKE_COLOR))
+
+        #Draws food
+        draw_block(food, (FOOD_COLOR))
 
         pygame.display.update()
+        clock.tick(speed)
 
-        clock.tick(15)
+def draw_block(position, color):
+    x = position[0] * GRID_SIZE
+    y = position[1] * GRID_SIZE
 
-def draw_snake(position, color):
-    x = position[0] * BLOCKS
-    y = position[1] * BLOCKS
-
-    pygame.draw.rect(screen, color, (x, y, BLOCKS, BLOCKS))
+    pygame.draw.rect(screen, color, (x, y, GRID_SIZE, GRID_SIZE))
 
 def detect_movement(direction, event):
     if event.type == pygame.KEYDOWN:
@@ -69,6 +104,12 @@ def move_snake(pos_x, pos_y, direction):
         pos_x = pos_x + 1;
 
     return[pos_x, pos_y]
+
+def detect_food_collision(snake_head, food_pos):
+    if snake_head == food_pos:
+        new_food = [random.randint(0, COLUMN_SIZE - 1), random.randint(0, ROW_SIZE - 1)]
+        return True, new_food
+    return False, food_pos
 
 gameLoop()
 pygame.quit()
