@@ -34,13 +34,13 @@ def gameLoop():
         
         screen.fill((0,0,0))
 
-        create_block([snake_pos_x, snake_pos_y], (SNAKE_COLOR))
+        draw_snake([snake_pos_x, snake_pos_y], (SNAKE_COLOR))
 
         pygame.display.update()
 
         clock.tick(15)
 
-def create_block(position, color):
+def draw_snake(position, color):
     x = position[0] * BLOCKS
     y = position[1] * BLOCKS
 
