@@ -1,6 +1,8 @@
 import pygame
 import random
 
+pygame.init()
+
 #Constants for Sizing
 COLUMN_SIZE = 60
 ROW_SIZE = 40
@@ -15,7 +17,10 @@ FONT_COLOR = (0, 255, 0)
 #Constant for snake initial speed
 SPEED = 10
 
-pygame.init()
+OVER_FONT = pygame.font.SysFont("arial", 50)
+RESTART_FONT = pygame.font.SysFont("arial", 30)
+SCORE_FONT = pygame.font.SysFont("arial", 20)
+
 
 #Initialise game screen
 screen = pygame.display.set_mode((COLUMN_SIZE*GRID_SIZE, ROW_SIZE*GRID_SIZE))
@@ -38,6 +43,8 @@ def gameLoop():
 
     #Dictates snake movement speed 
     speed = SPEED
+
+    score = 0
 
     #Snake initial movement direction is right
     direction = "RIGHT"
@@ -66,7 +73,9 @@ def gameLoop():
 
         #Check if food had been eaten 
         food_eaten, food = detect_food_collision(new_head, food)
-        if not food_eaten:
+        if food_eaten:
+            score += 1
+        else:
             snake.pop()
 
         #Draw Screen
@@ -83,13 +92,20 @@ def gameLoop():
         clock.tick(speed)
     
     #Initialize Restart Screen
-    game_restart()
+    game_restart(score)
+
+
 
 def draw_block(position, color):
     x = position[0] * GRID_SIZE
     y = position[1] * GRID_SIZE
 
     pygame.draw.rect(screen, color, (x, y, GRID_SIZE, GRID_SIZE))
+
+def draw_score(score):
+    text = SCORE_FONT.render(f"Score: {score}", True, FONT_COLOR)
+    screen.blit(text, (10,10))
+    
 
 def detect_movement(direction, event):
     if event.type == pygame.KEYDOWN:
@@ -135,16 +151,24 @@ def detect_collision(head, body):
 
     return False
 
-def game_restart():
-    font = pygame.font.SysFont("arial", 30)
-    text = font.render("GAME OVER, PRESSS R to RESTART or Q to QUIT", True, (FONT_COLOR))
-    rect = text.get_rect(center = (COLUMN_SIZE * GRID_SIZE // 2, ROW_SIZE * GRID_SIZE // 2))
+def game_restart(score):
+    over_text = OVER_FONT.render("GAME OVER", True, (FONT_COLOR))
+    restart_text = RESTART_FONT.render("PRESS R to RESTART or Q to QUIT", True, (FONT_COLOR))
+    score_text = SCORE_FONT.render(f"SCORE: {score}", True, (FONT_COLOR))
+    
+    over_rect = over_text.get_rect(center = (COLUMN_SIZE * GRID_SIZE // 2, ROW_SIZE * GRID_SIZE // 2 - 120))
+    restart_rect = restart_text.get_rect(center = (COLUMN_SIZE * GRID_SIZE // 2, ROW_SIZE * GRID_SIZE // 2 + 40))
+    score_rect = score_text.get_rect(center = (COLUMN_SIZE * GRID_SIZE // 2, ROW_SIZE * GRID_SIZE // 2 - 30))
+    
+
 
     waiting = True
 
     while waiting:
         screen.fill(SCREEN_COLOR)
-        screen.blit(text, rect)
+        screen.blit(over_text, over_rect)
+        screen.blit(restart_text, restart_rect)
+        screen.blit(score_text, score_rect)
         pygame.display.update()
 
         for event in pygame.event.get():
@@ -161,8 +185,6 @@ def game_restart():
                 elif event.key == pygame.K_q:
                     pygame.quit()
                     return
-            
-
 
 
 gameLoop()
