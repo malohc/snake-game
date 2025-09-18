@@ -74,6 +74,7 @@ def gameLoop():
         #Check if food had been eaten 
         food_eaten, food = detect_food_collision(new_head, food)
         if food_eaten:
+            #Updates score when food is eaten
             score += 1
         else:
             snake.pop()
